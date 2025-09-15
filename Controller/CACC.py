@@ -1,71 +1,20 @@
-"""
-Cooperative Adaptive Cruise Control (CACC) Module
+# Cooperative Adaptive Cruise Control
+class CACC:
+    def __init__(self, k_p=0.2, k_v=0.4, k_a=0.2, s0=2.0, T=0.1):
+        self.k_p = k_p
+        self.k_v = k_v
+        self.k_a = k_a
+        self.s0 = s0
+        self.T = T
 
-This module implements the Cooperative Adaptive Cruise Control algorithm for connected
-autonomous vehicles in the mixed-traffic platoon simulation.
-"""
+    def desired_gap(self, v_self):
+        return self.s0 + self.T * v_self
 
-
-class CACCController:
-    """
-    Cooperative Adaptive Cruise Control Controller class.
-    
-    This class implements the CACC algorithm that uses vehicle-to-vehicle communication
-    to maintain tighter following distances and improve traffic flow.
-    """
-    
-    def __init__(self, desired_speed=60.0, time_gap=0.6):
-        """
-        Initialize the CACC controller.
-        
-        Args:
-            desired_speed (float): Desired cruise speed in km/h
-            time_gap (float): Desired time gap to leading vehicle in seconds (shorter than ACC)
-        """
-        self.desired_speed = desired_speed
-        self.time_gap = time_gap
-        self.controller_type = "CACC"
-        self.communication_enabled = True
-        
-    def calculate_acceleration(self, current_speed, leading_vehicle_distance, 
-                             leading_vehicle_speed, leading_vehicle_acceleration=None):
-        """
-        Calculate the required acceleration based on CACC algorithm.
-        
-        Args:
-            current_speed (float): Current vehicle speed
-            leading_vehicle_distance (float): Distance to leading vehicle
-            leading_vehicle_speed (float): Speed of leading vehicle
-            leading_vehicle_acceleration (float): Acceleration of leading vehicle (from V2V communication)
-            
-        Returns:
-            float: Required acceleration
-        """
-        # Placeholder for CACC algorithm implementation
-        # This would contain the actual CACC control logic with V2V communication
-        return 0.0
-        
-    def process_v2v_message(self, message):
-        """
-        Process vehicle-to-vehicle communication message.
-        
-        Args:
-            message (dict): V2V communication message containing vehicle state information
-        """
-        if self.communication_enabled:
-            # Process the received V2V message
-            pass
-            
-    def update(self, vehicle_state, environment_state, v2v_data=None):
-        """Update the CACC controller with current vehicle, environment, and V2V data."""
-        if v2v_data:
-            self.process_v2v_message(v2v_data)
-        
-    def get_control_output(self):
-        """Get the current control output from the CACC controller."""
-        return {
-            "controller_type": self.controller_type,
-            "desired_speed": self.desired_speed,
-            "time_gap": self.time_gap,
-            "communication_enabled": self.communication_enabled
-        }
+    def compute_accel(self, v_self, s_front, v_front, a_front=0.0):
+        s_des = self.desired_gap(v_self)
+        gap_error = s_front - s_des
+        vel_error = v_front - v_self
+        accel = (self.k_p * gap_error +
+                 self.k_v * vel_error +
+                 self.k_a * a_front)
+        return float(accel)

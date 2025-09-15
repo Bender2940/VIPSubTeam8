@@ -1,55 +1,17 @@
-"""
-Adaptive Cruise Control (ACC) Module
+# Adaptive Cruise Control
+class ACC:
+    def __init__(self, k_p=0.2, k_v=0.4, s0=2.0, T=0.1):
+        self.k_p = k_p
+        self.k_v = k_v
+        self.s0 = s0
+        self.T = T
 
-This module implements the Adaptive Cruise Control algorithm for autonomous vehicles
-in the mixed-traffic platoon simulation.
-"""
+    def desired_gap(self, v_self):
+        return self.s0 + self.T * v_self
 
-
-class ACCController:
-    """
-    Adaptive Cruise Control Controller class.
-    
-    This class implements the ACC algorithm for maintaining safe following distances
-    and desired speeds in traffic.
-    """
-    
-    def __init__(self, desired_speed=60.0, time_gap=1.5):
-        """
-        Initialize the ACC controller.
-        
-        Args:
-            desired_speed (float): Desired cruise speed in km/h
-            time_gap (float): Desired time gap to leading vehicle in seconds
-        """
-        self.desired_speed = desired_speed
-        self.time_gap = time_gap
-        self.controller_type = "ACC"
-        
-    def calculate_acceleration(self, current_speed, leading_vehicle_distance, leading_vehicle_speed):
-        """
-        Calculate the required acceleration based on ACC algorithm.
-        
-        Args:
-            current_speed (float): Current vehicle speed
-            leading_vehicle_distance (float): Distance to leading vehicle
-            leading_vehicle_speed (float): Speed of leading vehicle
-            
-        Returns:
-            float: Required acceleration
-        """
-        # Placeholder for ACC algorithm implementation
-        # This would contain the actual ACC control logic
-        return 0.0
-        
-    def update(self, vehicle_state, environment_state):
-        """Update the ACC controller with current vehicle and environment state."""
-        pass
-        
-    def get_control_output(self):
-        """Get the current control output from the ACC controller."""
-        return {
-            "controller_type": self.controller_type,
-            "desired_speed": self.desired_speed,
-            "time_gap": self.time_gap
-        }
+    def compute_accel(self, v_self, s_front, v_front):
+        s_des = self.desired_gap(v_self)
+        gap_error = s_front - s_des
+        vel_error = v_front - v_self
+        accel = self.k_p * gap_error + self.k_v * vel_error
+        return float(accel)
