@@ -2,6 +2,8 @@
 Run baseline vs TTC-augmented controllers in a mixed platoon and plot results.
 """
 
+import matplotlib
+matplotlib.use("Agg")  # headless backend for saving files
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -46,7 +48,7 @@ def plot_signals(history, title: str):
     axes[2].axhline(1.0, color="r", linestyle="--", linewidth=1, label="1s threshold")
 
     plt.tight_layout()
-    plt.show()
+    return fig
 
 
 if __name__ == "__main__":
@@ -58,6 +60,8 @@ if __name__ == "__main__":
         hist, _ = run_case(f"Case", k_ttc=k)
         histories.append((k, hist))
 
-    # Plot first and last to see difference
-    plot_signals(histories[0][1], "Baseline (k_ttc=0.0)")
-    plot_signals(histories[-1][1], f"Improved (k_ttc={k_ttc_values[-1]})")
+    # Plot first and last to see difference, save to plots/
+    fig0 = plot_signals(histories[0][1], "Baseline (k_ttc=0.0)")
+    figN = plot_signals(histories[-1][1], f"Improved (k_ttc={k_ttc_values[-1]})")
+    fig0.savefig("plots/baseline_kttc0.png", dpi=150)
+    figN.savefig(f"plots/improved_kttc{k_ttc_values[-1]}.png", dpi=150)
